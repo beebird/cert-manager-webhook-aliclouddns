@@ -1,25 +1,26 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ include "aliclouddns-webhook.fullname" . }}
+  name: {{ include "cert-manager-webhook-aliclouddns.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
-    app: {{ include "aliclouddns-webhook.name" . }}
-    chart: {{ include "aliclouddns-webhook.chart" . }}
+    app: {{ include "cert-manager-webhook-aliclouddns.name" . }}
+    chart: {{ include "cert-manager-webhook-aliclouddns.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ include "aliclouddns-webhook.name" . }}
+      app: {{ include "cert-manager-webhook-aliclouddns.name" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ include "aliclouddns-webhook.name" . }}
+        app: {{ include "cert-manager-webhook-aliclouddns.name" . }}
         release: {{ .Release.Name }}
     spec:
-      serviceAccountName: {{ include "aliclouddns-webhook.fullname" . }}
+      serviceAccountName: {{ include "cert-manager-webhook-aliclouddns.fullname" . }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -53,7 +54,7 @@ spec:
       volumes:
         - name: certs
           secret:
-            secretName: {{ include "aliclouddns-webhook.servingCertificate" . }}
+            secretName: {{ include "cert-manager-webhook-aliclouddns.servingCertificate" . }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

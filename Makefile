@@ -1,5 +1,6 @@
-IMAGE_NAME := "loongcn/webhook-aliclouddns"
+IMAGE_NAME := "loongcn/cert-manager-webhook-aliclouddns"
 IMAGE_TAG := "latest"
+NAMESPACE := "cert-manager"
 
 OUT := $(shell pwd)/_out
 
@@ -14,7 +15,8 @@ build:
 .PHONY: rendered-manifest.yaml
 rendered-manifest.yaml:
 	helm template \
-	    --name aliclouddns-webhook \
+	    --name cert-manager-webhook-aliclouddns \
+		--namespace ${NAMESPACE} \
         --set image.repository=$(IMAGE_NAME) \
         --set image.tag=$(IMAGE_TAG) \
-        deploy/aliclouddns-webhook > "$(OUT)/rendered-manifest.yaml"
+        deploy/cert-manager-webhook-aliclouddns > "$(OUT)/rendered-manifest.yaml"

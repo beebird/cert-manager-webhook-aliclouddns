@@ -1,10 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "aliclouddns-webhook.fullname" . }}
+  name: {{ include "cert-manager-webhook-aliclouddns.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
-    app: {{ include "aliclouddns-webhook.name" . }}
-    chart: {{ include "aliclouddns-webhook.chart" . }}
+    app: {{ include "cert-manager-webhook-aliclouddns.name" . }}
+    chart: {{ include "cert-manager-webhook-aliclouddns.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
@@ -15,5 +16,5 @@ spec:
       protocol: TCP
       name: https
   selector:
-    app: {{ include "aliclouddns-webhook.name" . }}
+    app: {{ include "cert-manager-webhook-aliclouddns.name" . }}
     release: {{ .Release.Name }}
