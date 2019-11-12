@@ -16,6 +16,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   name: {{ include "cert-manager-webhook-aliclouddns.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app: {{ include "cert-manager-webhook-aliclouddns.name" . }}
     chart: {{ include "cert-manager-webhook-aliclouddns.chart" . }}
@@ -36,6 +37,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
   name: {{ include "cert-manager-webhook-aliclouddns.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app: {{ include "cert-manager-webhook-aliclouddns.name" . }}
     chart: {{ include "cert-manager-webhook-aliclouddns.chart" . }}
