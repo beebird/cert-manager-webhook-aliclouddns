@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aliclouddns-secret
+  namespace: cert-manager
+type: Opaque
+data:
+  accesskey-id: <base64 encoded accessKeyId>
+  accesskey-secret: <base64 encoded accessKeySecret>
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: cluster-issuer-letsencrypt-wildcard-staging
+spec:
+  acme:
+    email: tester@example.com
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-staging-account-key
+    solvers:
+    - dns01:
+        webhook:
+          groupName: acme.loongcn.com
+          solverName: aliclouddns-solver
+          config:
+            regionId: cn-hangzhou
+            accessKeyIdRef:
+              name: aliclouddns-secret
+              key: accesskey-id
+            accessKeySecretRef:
+              name: aliclouddns-secret
+              key: accesskey-secret
+
+            # Optional config, shown with default values
+            #   all times in seconds
+            timeout: 30
+      selector: {}

@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: wildcard-certificate-test
+  namespace: default
+spec:
+  secretName: test-example-com-tls
+  commonName: test.example.com
+  dnsNames:
+  - test.example.com
+  - '*.test.example.com'
+  issuerRef:
+    name: cluster-issuer-letsencrypt-wildcard-staging
+    kind: ClusterIssuer
+  acme:
+    config:
+      - dns01:
+          provider: dns
+        domains:
+          - test.example.com
+          - '*.test.example.com'
