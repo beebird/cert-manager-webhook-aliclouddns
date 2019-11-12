@@ -1,17 +1,17 @@
-module github.com/jetstack/cert-manager-webhook-example
+module github.com/jetstack/cert-manager-webhook-aliclouddns
 
-go 1.12
+go 1.13.1
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190708091929-88eb281ef085
 	github.com/imdario/mergo v0.3.7 // indirect
-	github.com/jetstack/cert-manager v0.8.0-alpha.0
-	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a // indirect
-	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
-	k8s.io/apiextensions-apiserver v0.0.0-20190413053546-d0acb7a76918
-	k8s.io/client-go v11.0.0+incompatible
+	github.com/jetstack/cert-manager v0.11.0
+	github.com/pkg/errors v0.8.1
+	k8s.io/apiextensions-apiserver v0.0.0-20190918161926-8f644eb6e783
+	k8s.io/apimachinery v0.0.0-20190913080033-27d36303b655
+	k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
 )
 
-replace k8s.io/client-go => k8s.io/client-go v0.0.0-20190413052642-108c485f896e
+replace k8s.io/client-go => k8s.io/client-go v0.0.0-20190918160344-1fbdaa4c8d90
 
 replace github.com/evanphx/json-patch => github.com/evanphx/json-patch v0.0.0-20190203023257-5858425f7550

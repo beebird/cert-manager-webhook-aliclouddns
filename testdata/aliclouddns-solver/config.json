@@ -1,0 +1,11 @@
+{
+  "regionId": "cn-hangzhou",
+  "accessKeyIdRef": {
+    "name": "aliclouddns-secret",
+    "key": "accesskey-id"
+  },
+  "accessKeySecretRef": {
+    "name": "aliclouddns-secret",
+    "key": "accesskey-secret"
+  }
+}
