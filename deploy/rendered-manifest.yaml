@@ -1,0 +1,321 @@
+---
+# Source: cert-manager-webhook-aliclouddns/templates/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cert-manager-webhook-aliclouddns
+  namespace: cert-manager
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+---
+# Grant the webhook permission to read the ConfigMap containing the Kubernetes
+# apiserver's requestheader-ca-certificate.
+# This ConfigMap is automatically created by the Kubernetes apiserver.
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: cert-manager-webhook-aliclouddns
+  namespace: cert-manager
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cert-manager-webhook-aliclouddns
+subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: cert-manager-webhook-aliclouddns
+    namespace: cert-manager
+---
+# Grant cert-manager permission to validate using our apiserver
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  name: cert-manager-webhook-aliclouddns
+  namespace: cert-manager
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - 'secrets'
+    verbs:
+      - 'get'
+---
+# Grant the webhook permission to read the ConfigMap containing the Kubernetes
+# apiserver's requestheader-ca-certificate.
+# This ConfigMap is automatically created by the Kubernetes apiserver.
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: cert-manager-webhook-aliclouddns:webhook-authentication-reader
+  namespace: kube-system
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: extension-apiserver-authentication-reader
+subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: cert-manager-webhook-aliclouddns
+    namespace: cert-manager
+---
+# apiserver gets the auth-delegator role to delegate auth decisions to
+# the core apiserver
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: cert-manager-webhook-aliclouddns:auth-delegator
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: cert-manager-webhook-aliclouddns
+    namespace: cert-manager
+---
+# Grant cert-manager permission to validate using our apiserver
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: cert-manager-webhook-aliclouddns:domain-solver
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+rules:
+  - apiGroups:
+      - acme.loongcn.com
+    resources:
+      - '*'
+    verbs:
+      - 'create'
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: cert-manager-webhook-aliclouddns:domain-solver
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cert-manager-webhook-aliclouddns:domain-solver
+subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: cert-manager
+    namespace: cert-manager
+
+---
+# Source: cert-manager-webhook-aliclouddns/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cert-manager-webhook-aliclouddns
+  namespace: "cert-manager"
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+spec:
+  type: ClusterIP
+  ports:
+    - port: 443
+      targetPort: https
+      protocol: TCP
+      name: https
+  selector:
+    app: cert-manager-webhook-aliclouddns
+    release: cert-manager-webhook-aliclouddns
+
+---
+# Source: cert-manager-webhook-aliclouddns/templates/deployment.yaml
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: cert-manager-webhook-aliclouddns
+  namespace: "cert-manager"
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+spec:
+  replicas: 
+  selector:
+    matchLabels:
+      app: cert-manager-webhook-aliclouddns
+      release: cert-manager-webhook-aliclouddns
+  template:
+    metadata:
+      labels:
+        app: cert-manager-webhook-aliclouddns
+        release: cert-manager-webhook-aliclouddns
+    spec:
+      serviceAccountName: cert-manager-webhook-aliclouddns
+      containers:
+        - name: cert-manager-webhook-aliclouddns
+          image: "loongcn/cert-manager-webhook-aliclouddns:latest"
+          imagePullPolicy: IfNotPresent
+          args:
+            - --tls-cert-file=/tls/tls.crt
+            - --tls-private-key-file=/tls/tls.key
+          env:
+            - name: GROUP_NAME
+              value: "acme.loongcn.com"
+          ports:
+            - name: https
+              containerPort: 443
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /healthz
+              port: https
+          readinessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /healthz
+              port: https
+          volumeMounts:
+            - name: certs
+              mountPath: /tls
+              readOnly: true
+          resources:
+            {}
+            
+      volumes:
+        - name: certs
+          secret:
+            secretName: cert-manager-webhook-aliclouddns-webhook-tls
+
+---
+# Source: cert-manager-webhook-aliclouddns/templates/apiservice.yaml
+apiVersion: apiregistration.k8s.io/v1beta1
+kind: APIService
+metadata:
+  name: v1alpha1.acme.loongcn.com
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+  annotations:
+    cert-manager.io/inject-ca-from: "cert-manager/cert-manager-webhook-aliclouddns-webhook-tls"
+spec:
+  group: acme.loongcn.com
+  groupPriorityMinimum: 1000
+  versionPriority: 15
+  service:
+    name: cert-manager-webhook-aliclouddns
+    namespace: cert-manager
+  version: v1alpha1
+
+---
+# Source: cert-manager-webhook-aliclouddns/templates/pki.yaml
+---
+# Create a selfsigned Issuer, in order to create a root CA certificate for
+# signing webhook serving certificates
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: cert-manager-webhook-aliclouddns-selfsign
+  namespace: "cert-manager"
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+spec:
+  selfSigned: {}
+
+---
+
+# Generate a CA Certificate used to sign certificates for the webhook
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: cert-manager-webhook-aliclouddns-ca
+  namespace: "cert-manager"
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+spec:
+  secretName: cert-manager-webhook-aliclouddns-ca
+  duration: 43800h # 5y
+  issuerRef:
+    name: cert-manager-webhook-aliclouddns-selfsign
+  commonName: "ca.cert-manager-webhook-aliclouddns.cert-manager"
+  isCA: true
+
+---
+
+# Create an Issuer that uses the above generated CA certificate to issue certs
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: cert-manager-webhook-aliclouddns-ca
+  namespace: "cert-manager"
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+spec:
+  ca:
+    secretName: cert-manager-webhook-aliclouddns-ca
+
+---
+
+# Finally, generate a serving certificate for the webhook to use
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: cert-manager-webhook-aliclouddns-webhook-tls
+  namespace: "cert-manager"
+  labels:
+    app: cert-manager-webhook-aliclouddns
+    chart: cert-manager-webhook-aliclouddns-0.1.0
+    release: cert-manager-webhook-aliclouddns
+    heritage: Tiller
+spec:
+  secretName: cert-manager-webhook-aliclouddns-webhook-tls
+  duration: 8760h # 1y
+  issuerRef:
+    name: cert-manager-webhook-aliclouddns-ca
+  dnsNames:
+  - cert-manager-webhook-aliclouddns
+  - cert-manager-webhook-aliclouddns.cert-manager
+  - cert-manager-webhook-aliclouddns.cert-manager.svc
+

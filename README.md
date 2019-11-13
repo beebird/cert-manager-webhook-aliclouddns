@@ -6,41 +6,52 @@ Since aliclouddns has not been included in the core codebase of cert-manager, an
 
 ## How to use:
 
-1. clone the repo and generate manifest yaml:
 
-   ```bash
-   cd cert-manager-webhook-aliclouddns
-   make rendered-manifest.yaml
-   ```
-   
 2. apply the yaml to deploy the webhook:
 
    ```bash
-   kubectl apply -f _out/rendered-manifest.yaml
+   kubectl apply -f https://raw.githubusercontent.com/beebird/cert-manager-webhook-aliclouddns/master/deploy/rendered-manifest.yaml
    ```
 
-3. fill in blanks in files under ``example``:
+3. download and update example issuer and cert files:
 
    ```example
    ├── example
    │   ├── cluster-issuer-letsencrypt-staging.yaml
    │   └── wildcard-certificate-test.yaml
    ```
+   ```bash
+   curl -SsL -o issuer.yaml https://raw.githubusercontent.com/beebird/cert-manager-webhook-aliclouddns/master/example/cluster-issuer-letsencrypt-staging.yaml
+   curl -SsL -o certificate.yaml  https://raw.githubusercontent.com/beebird/cert-manager-webhook-aliclouddns/master/example/wildcard-certificate-test.yaml
+   ```
 
 4. Apply updated yaml files to create a clusterissuer and a test certificate:
 
    ```bash
-   kubectl apply -f example/cluster-issuer-letsencrypt-staging.yaml
-   kubectl apply -f example/wildcard-certificate-test.yaml
+   kubectl apply -f issuer.yaml
+   kubectl apply -f certificate.yaml
    ```
 
 ## Customize your webhook
 
-You may want to make some customization to this webhook, here're something you can modify:
+You may want to make some customization to this webhook, here're the steps:
 
-- ``groupName`` in ``deploy/cert-manager-webhook-aliclouddns/values.yaml`` and ``example/cluster-issuer-letsencrypt-staging.yaml``
-- ``NAMESPACE`` in ``Makefile``
+- clone the repo
+
+- modify ``groupName`` in ``deploy/cert-manager-webhook-aliclouddns/values.yaml`` and ``example/cluster-issuer-letsencrypt-staging.yaml``
+
+- modify ``NAMESPACE`` in ``Makefile``
+
 - If you like, you can even build your own image (``IMAGE_NAME`` in ``Makefile``)
+
+- generate manifest yaml:
+
+  ```bash
+  cd cert-manager-webhook-aliclouddns
+  make rendered-manifest.yaml
+  ```
+
+  
 
 
 
