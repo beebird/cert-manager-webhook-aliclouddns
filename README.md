@@ -21,9 +21,11 @@ Since aliclouddns has not been included in the core codebase of cert-manager, an
 
 3. fill in blanks in files under ``example``:
 
-   example
-   ├── cluster-issuer-letsencrypt-staging.yaml
-   └── wildcard-certificate-test.yaml
+   ```example
+   ├── example
+   │   ├── cluster-issuer-letsencrypt-staging.yaml
+   │   └── wildcard-certificate-test.yaml
+   ```
 
 4. Apply updated yaml files to create a clusterissuer and a test certificate:
 
